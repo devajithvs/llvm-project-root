@@ -337,7 +337,30 @@ FileManager::getFileRef(StringRef Filename, bool openFile, bool CacheFailure) {
   }
 
   FileEntryRef ReturnedRef(*NamedFileEnt);
-  if (ReusingEntry) { // Already have an entry with this inode, return it.
+  if (ReusingEntry &&
+      llvm::sys::toTimeT(Status.getLastModificationTime()) == UFE->ModTime) {
+    // Already have an entry with this inode, return it.
+
+    // FIXME: This hack ensures that `getDir()` will use the path that was
+    // used to lookup this file, even if we found a file by different path
+    // first. This is required in order to find a module's structure when its
+    // headers/module map are mapped in the VFS.
+    //
+    // See above for how this will eventually be removed. `IsVFSMapped`
+    // *cannot* be narrowed to `ExposesExternalVFSPath` as crash reproducers
+    // also depend on this logic and they have `use-external-paths: false`.
+    if (&DirInfo.getDirEntry() != UFE->Dir && Status.IsVFSMapped)
+      UFE->Dir = &DirInfo.getDirEntry();
+
+    // Always update LastRef to the last name by which a file was accessed.
+    // FIXME: Neither this nor always using the first reference is correct; we
+    // want to switch towards a design where we return a FileName object that
+    // encapsulates both the name by which the file was accessed and the
+    // corresponding FileEntry.
+    // FIXME: LastRef should be removed from FileEntry once all clients adopt
+    // FileEntryRef.
+    UFE->LastRef = ReturnedRef;
+
     return ReturnedRef;
   }
 
