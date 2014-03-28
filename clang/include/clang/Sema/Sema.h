@@ -14731,6 +14731,7 @@ protected:
   friend class ASTReader;
   friend class ASTDeclReader;
   friend class ASTWriter;
+  friend class ::cling::DeclUnloader;
 
 public:
   /// Retrieve the keyword associated
