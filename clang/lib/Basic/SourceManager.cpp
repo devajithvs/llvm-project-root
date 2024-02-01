@@ -359,10 +359,10 @@ bool SourceManager::isMainFile(const FileEntry &SourceFile) {
 }
 
 void SourceManager::invalidateCache(FileID FID) {
-  const FileEntry* Entry = getFileEntryForID(FID);
+  OptionalFileEntryRef Entry = getFileEntryRefForID(FID);
   if (!Entry)
     return;
-  if (ContentCache *&E = FileInfos[Entry]) {
+  if (ContentCache *&E = FileInfos[*Entry]) {
     E->setBuffer(nullptr);
     E = 0;
   }
@@ -374,7 +374,7 @@ void SourceManager::invalidateCache(FileID FID) {
       CC.setBuffer(nullptr);
     }
   }
-  getFileManager().invalidateCache(const_cast<FileEntry*>(Entry));
+  getFileManager().invalidateCache(*Entry);
 }
 
 void SourceManager::initializeForReplay(const SourceManager &Old) {

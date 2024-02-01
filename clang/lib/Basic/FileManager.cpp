@@ -643,9 +643,9 @@ FileManager::getNoncachedStatValue(StringRef Path,
   return std::error_code();
 }
 
-void FileManager::invalidateCache(FileEntry *Entry) {
+void FileManager::invalidateCache(FileEntryRef Entry) {
   assert(Entry && "Cannot invalidate a NULL FileEntry");
-  FileEntriesToReread.insert(Entry->getLastRef());
+  FileEntriesToReread.insert(Entry);
 }
 
 void FileManager::GetUniqueIDMapping(
