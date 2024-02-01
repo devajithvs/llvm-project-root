@@ -1698,7 +1698,7 @@ public:
     PreprocessorLexer *SavedCurPPLexer;
     TokenLexer* SavedCurTokenLexer;
     ConstSearchDirIterator SavedCurDirLookup;
-    enum CurLexerKind SavedCurLexerKind;
+    LexerCallback SavedCurLexerCallback;
     unsigned SavedLexLevel;
 
   public:
@@ -1710,7 +1710,7 @@ public:
         SavedCurPPLexer(PP.CurPPLexer),
         SavedCurTokenLexer(PP.CurTokenLexer.release()),
         SavedCurDirLookup(PP.CurDirLookup),
-        SavedCurLexerKind(PP.CurLexerKind),
+        SavedCurLexerCallback(PP.CurLexerCallback),
         SavedLexLevel(PP.LexLevel)
     {
       PP.CachedLexPos = 0;
@@ -1720,12 +1720,12 @@ public:
       PP.CurPPLexer = 0;
       PP.CurTokenLexer.reset(0);
       PP.CurDirLookup = 0;
-      PP.CurLexerKind = CLK_CachingLexer;
+      PP.CurLexerCallback = CLK_CachingLexer;
       PP.LexLevel = 0;
     }
 
     void pop() {
-      if (SavedCurLexerKind == (enum CurLexerKind)~0U)
+      if (SavedCurLexerCallback == nullptr)
         return;
 
       //ExitCachingLexMode();
@@ -1736,7 +1736,7 @@ public:
       PP.CurPPLexer = SavedCurPPLexer;
       PP.CurTokenLexer.reset(SavedCurTokenLexer);
       PP.CurDirLookup = SavedCurDirLookup;
-      PP.CurLexerKind = SavedCurLexerKind;
+      PP.CurLexerCallback = SavedCurLexerCallback;
       PP.LexLevel = SavedLexLevel;
 
       SavedCachedLexPos = 0;
@@ -1746,7 +1746,7 @@ public:
       SavedCurPPLexer = 0;
       SavedCurTokenLexer = 0;
       SavedCurDirLookup = 0;
-      SavedCurLexerKind = (enum CurLexerKind)~0U;
+      SavedCurLexerCallback = nullptr;
       SavedLexLevel = ~0U;
     }
 
