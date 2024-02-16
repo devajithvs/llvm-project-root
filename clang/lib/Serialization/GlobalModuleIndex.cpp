@@ -480,8 +480,10 @@ namespace {
         return;
 
       for (const auto & I : *ExternalIDs)
-        for (FileEntryRef J : I.getValue())
-          InterestingIdentifiers[I.getKey()].push_back(getModuleFileInfo(J).ID);
+        for (auto J : I.getValue())
+          if (J)
+            InterestingIdentifiers[I.getKey()].push_back(
+                getModuleFileInfo(*J).ID);
     }
 
     /// Load the contents of the given module file into the builder.

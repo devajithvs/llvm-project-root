@@ -15,6 +15,8 @@
 #ifndef LLVM_CLANG_SERIALIZATION_GLOBALMODULEINDEX_H
 #define LLVM_CLANG_SERIALIZATION_GLOBALMODULEINDEX_H
 
+#include "clang/Basic/FileEntry.h"
+
 #include "llvm/ADT/DenseMap.h"
 #include <llvm/ADT/DenseSet.h>
 #include "llvm/ADT/SmallPtrSet.h"
@@ -127,7 +129,7 @@ class GlobalModuleIndex {
 
 public:
   using UserDefinedInterestingIDs =
-      llvm::StringMap<llvm::SmallVector<FileEntryRef, 2>>;
+      llvm::StringMap<llvm::SmallVector<OptionalFileEntryRef, 2>>;
 
   ~GlobalModuleIndex();
 
